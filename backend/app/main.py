@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base, init_db
-from app.routes import groups, expenses, debts, users
+from app.routes import groups, expenses, debts, users, admin
 from contextlib import asynccontextmanager
 import os
 from dotenv import load_dotenv
@@ -11,7 +11,6 @@ load_dotenv()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables on startup
     init_db()
     yield
 
@@ -32,6 +31,7 @@ app.include_router(groups.router, prefix="/api/groups", tags=["groups"])
 app.include_router(expenses.router, prefix="/api/expenses", tags=["expenses"])
 app.include_router(debts.router, prefix="/api/debts", tags=["debts"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
+app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 
 
 @app.get("/api/health")
