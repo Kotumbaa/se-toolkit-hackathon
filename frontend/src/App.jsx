@@ -54,7 +54,19 @@ function App() {
   // Check for saved session
   useEffect(() => {
     const savedUser = localStorage.getItem('expensesplitter_user')
-    if (savedUser) setCurrentUser(JSON.parse(savedUser))
+    if (!savedUser) return
+
+    const parsedUser = JSON.parse(savedUser)
+    setCurrentUser(parsedUser)
+
+    fetch(`${API_URL}/users/${parsedUser.id}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(freshUser => {
+        if (!freshUser) return
+        setCurrentUser(freshUser)
+        localStorage.setItem('expensesplitter_user', JSON.stringify(freshUser))
+      })
+      .catch(() => {})
   }, [])
 
   // ============ AUTH ============
@@ -324,6 +336,66 @@ function App() {
       fetchAdminData('groups')
     } catch { setError('Failed to delete group') }
   }
+
+  const renderAdminPanel = () => (
+    <>
+      <div className="d-flex gap-2 mb-3">
+        <Button variant={adminTab === 'stats' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('stats'); fetchAdminData('stats') }}>Stats</Button>
+        <Button variant={adminTab === 'users' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('users'); fetchAdminData('users') }}>Users</Button>
+        <Button variant={adminTab === 'groups' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('groups'); fetchAdminData('groups') }}>Groups</Button>
+      </div>
+      {adminTab === 'stats' && (
+        <Card><Card.Body>
+          {adminLoading ? <p>Loading...</p> : adminStats ? (
+            <Row>
+              <Col><div className="text-center"><h3>{adminStats.total_users}</h3><small className="text-muted">Users</small></div></Col>
+              <Col><div className="text-center"><h3>{adminStats.total_groups}</h3><small className="text-muted">Groups</small></div></Col>
+              <Col><div className="text-center"><h3>{adminStats.total_expenses}</h3><small className="text-muted">Expenses</small></div></Col>
+              <Col><div className="text-center"><h3>{adminStats.total_payments}</h3><small className="text-muted">Payments</small></div></Col>
+            </Row>
+          ) : <p className="text-muted">No data</p>}
+        </Card.Body></Card>
+      )}
+      {adminTab === 'users' && (
+        <Card><Card.Body>
+          {adminLoading ? <p>Loading...</p> : adminUsers.length === 0 ? <p className="text-muted">No users</p> : (
+            <table className="table table-sm">
+              <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Admin</th><th>Actions</th></tr></thead>
+              <tbody>
+                {adminUsers.map(u => (
+                  <tr key={u.id}>
+                    <td>{u.id}</td><td>{u.username}</td><td>{u.display_name}</td>
+                    <td><Badge bg={u.is_admin ? 'success' : 'secondary'}>{u.is_admin ? 'Yes' : 'No'}</Badge></td>
+                    <td>
+                      <Button size="sm" variant="outline-primary" className="me-1" onClick={() => toggleUserAdmin(u.id)}>Toggle Admin</Button>
+                      {u.id !== currentUser.id && <Button size="sm" variant="outline-danger" onClick={() => deleteUser(u.id)}>Delete</Button>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Card.Body></Card>
+      )}
+      {adminTab === 'groups' && (
+        <Card><Card.Body>
+          {adminLoading ? <p>Loading...</p> : adminGroups.length === 0 ? <p className="text-muted">No groups</p> : (
+            <table className="table table-sm">
+              <thead><tr><th>ID</th><th>Name</th><th>Code</th><th>Created By</th><th>Actions</th></tr></thead>
+              <tbody>
+                {adminGroups.map(g => (
+                  <tr key={g.id}>
+                    <td>{g.id}</td><td>{g.name}</td><td><code>{g.invite_code}</code></td><td>{g.created_by_id}</td>
+                    <td><Button size="sm" variant="outline-danger" onClick={() => deleteGroup(g.id)}>Delete</Button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </Card.Body></Card>
+      )}
+    </>
+  )
 
   // ============ AUTH SCREEN ============
   if (!currentUser) {
@@ -627,69 +699,19 @@ function App() {
                 {/* ===== ADMIN ===== */}
                 {isCurrentUserAdmin && (
                   <Tab eventKey="admin" title="⚙️ Admin">
-                    <div className="d-flex gap-2 mb-3">
-                      <Button variant={adminTab === 'stats' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('stats'); fetchAdminData('stats') }}>Stats</Button>
-                      <Button variant={adminTab === 'users' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('users'); fetchAdminData('users') }}>Users</Button>
-                      <Button variant={adminTab === 'groups' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('groups'); fetchAdminData('groups') }}>Groups</Button>
-                    </div>
-                    {adminTab === 'stats' && (
-                      <Card><Card.Body>
-                        {adminLoading ? <p>Loading...</p> : adminStats ? (
-                          <Row>
-                            <Col><div className="text-center"><h3>{adminStats.total_users}</h3><small className="text-muted">Users</small></div></Col>
-                            <Col><div className="text-center"><h3>{adminStats.total_groups}</h3><small className="text-muted">Groups</small></div></Col>
-                            <Col><div className="text-center"><h3>{adminStats.total_expenses}</h3><small className="text-muted">Expenses</small></div></Col>
-                            <Col><div className="text-center"><h3>{adminStats.total_payments}</h3><small className="text-muted">Payments</small></div></Col>
-                          </Row>
-                        ) : <p className="text-muted">No data</p>}
-                      </Card.Body></Card>
-                    )}
-                    {adminTab === 'users' && (
-                      <Card><Card.Body>
-                        {adminLoading ? <p>Loading...</p> : adminUsers.length === 0 ? <p className="text-muted">No users</p> : (
-                          <table className="table table-sm">
-                            <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Admin</th><th>Actions</th></tr></thead>
-                            <tbody>
-                              {adminUsers.map(u => (
-                                <tr key={u.id}>
-                                  <td>{u.id}</td><td>{u.username}</td><td>{u.display_name}</td>
-                                  <td><Badge bg={u.is_admin ? 'success' : 'secondary'}>{u.is_admin ? 'Yes' : 'No'}</Badge></td>
-                                  <td>
-                                    <Button size="sm" variant="outline-primary" className="me-1" onClick={() => toggleUserAdmin(u.id)}>Toggle Admin</Button>
-                                    {u.id !== currentUser.id && <Button size="sm" variant="outline-danger" onClick={() => deleteUser(u.id)}>Delete</Button>}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        )}
-                      </Card.Body></Card>
-                    )}
-                    {adminTab === 'groups' && (
-                      <Card><Card.Body>
-                        {adminLoading ? <p>Loading...</p> : adminGroups.length === 0 ? <p className="text-muted">No groups</p> : (
-                          <table className="table table-sm">
-                            <thead><tr><th>ID</th><th>Name</th><th>Code</th><th>Created By</th><th>Actions</th></tr></thead>
-                            <tbody>
-                              {adminGroups.map(g => (
-                                <tr key={g.id}>
-                                  <td>{g.id}</td><td>{g.name}</td><td><code>{g.invite_code}</code></td><td>{g.created_by_id}</td>
-                                  <td><Button size="sm" variant="outline-danger" onClick={() => deleteGroup(g.id)}>Delete</Button></td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        )}
-                      </Card.Body></Card>
-                    )}
+                    {renderAdminPanel()}
                   </Tab>
                 )}
               </Tabs>
             </>
           ) : (
-            <div className="text-center text-muted py-5">
-              <h4>Select a group from the sidebar or create/join a new one</h4>
-            </div>
+            activeTab === 'admin' && isCurrentUserAdmin ? (
+              renderAdminPanel()
+            ) : (
+              <div className="text-center text-muted py-5">
+                <h4>Select a group from the sidebar or create/join a new one</h4>
+              </div>
+            )
           )}
         </Col>
       </Row>
