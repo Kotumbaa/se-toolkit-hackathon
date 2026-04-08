@@ -17,6 +17,7 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = None
     card_number: Optional[str] = None
     payment_details: Optional[str] = None
+    is_admin: Optional[int] = None
 
 
 class UserResponse(BaseModel):
@@ -26,6 +27,7 @@ class UserResponse(BaseModel):
     phone: str = ""
     card_number: str = ""
     payment_details: str = ""
+    is_admin: int = 0
     created_at: Optional[datetime] = None
 
     class Config:

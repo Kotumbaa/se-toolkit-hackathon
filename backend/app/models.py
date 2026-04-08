@@ -11,7 +11,8 @@ class User(Base):
     display_name = Column(String(100), nullable=False)
     phone = Column(String(20), default="")
     card_number = Column(String(20), default="")
-    payment_details = Column(Text, default="")  # any other payment info
+    payment_details = Column(Text, default="")
+    is_admin = Column(Integer, default=0)  # 1 = admin, 0 = regular
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
 
