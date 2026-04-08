@@ -281,10 +281,11 @@ function App() {
   const myCredits = currentMember ? debts.filter(d =>
     d.to_member_id === currentMember.id
   ) : []
+  const isCurrentUserAdmin = Boolean(currentUser?.is_admin)
 
   // ============ ADMIN ============
   const fetchAdminData = async (type) => {
-    if (!currentUser?.is_admin) return
+    if (!isCurrentUserAdmin) return
     setAdminLoading(true)
     try {
       if (type === 'users') {
@@ -383,7 +384,7 @@ function App() {
         <h1 className="mb-0">💰 ExpenseSplitter</h1>
         <div className="d-flex gap-2">
           <Badge bg="primary" style={{fontSize: '0.9rem'}}>{currentUser.display_name}</Badge>
-          {currentUser.is_admin && (
+          {isCurrentUserAdmin && (
             <Button variant="outline-dark" size="sm" onClick={() => { setActiveTab('admin'); fetchAdminData('stats') }}>⚙️ Admin</Button>
           )}
           <Button variant="outline-secondary" size="sm" onClick={openProfileModal}>👤 Profile</Button>
@@ -624,7 +625,7 @@ function App() {
                 </Tab>
 
                 {/* ===== ADMIN ===== */}
-                {currentUser?.is_admin && (
+                {isCurrentUserAdmin && (
                   <Tab eventKey="admin" title="⚙️ Admin">
                     <div className="d-flex gap-2 mb-3">
                       <Button variant={adminTab === 'stats' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('stats'); fetchAdminData('stats') }}>Stats</Button>
