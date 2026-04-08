@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Form, ListGroup, Badge, Alert, Tabs, Tab, Modal, Nav, InputGroup, CopyButton } from 'react-bootstrap'
+import { Container, Row, Col, Card, Button, Form, ListGroup, Badge, Alert, Tabs, Tab, Modal, Nav, InputGroup } from 'react-bootstrap'
 
 const API_URL = '/api'
 
@@ -272,12 +272,14 @@ function App() {
     day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
   })
 
-  const myDebts = currentUser ? debts.filter(d =>
-    d.from_member.toLowerCase() === currentUser.display_name.toLowerCase()
+  const currentMember = currentUser ? members.find(m => m.user_id === currentUser.id) : null
+
+  const myDebts = currentMember ? debts.filter(d =>
+    d.from_member_id === currentMember.id
   ) : []
 
-  const myCredits = currentUser ? debts.filter(d =>
-    d.to_member.toLowerCase() === currentUser.display_name.toLowerCase()
+  const myCredits = currentMember ? debts.filter(d =>
+    d.to_member_id === currentMember.id
   ) : []
 
   // ============ ADMIN ============
@@ -570,6 +572,7 @@ function App() {
                             <Col md={2}>
                               <Form.Control type="number" step="0.01" placeholder="Amount"
                                 value={expenseForm.amount}
+                                min="0.01"
                                 onChange={(e) => setExpenseForm({...expenseForm, amount: e.target.value})} required />
                             </Col>
                             <Col md={3}>
@@ -727,7 +730,7 @@ function App() {
               <Form.Group>
                 <Form.Label>Amount (₽)</Form.Label>
                 <Form.Control type="number" step="0.01" value={paymentAmount}
-                  onChange={(e) => setPaymentAmount(e.target.value)} max={selectedDebt.amount} />
+                  onChange={(e) => setPaymentAmount(e.target.value)} min="0.01" max={selectedDebt.amount} />
                 <Form.Text className="text-muted">Suggested: {selectedDebt.amount.toFixed(2)} ₽</Form.Text>
               </Form.Group>
             </>

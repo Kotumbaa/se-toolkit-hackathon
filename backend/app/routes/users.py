@@ -57,8 +57,6 @@ def update_user(user_id: int, update: schemas.UserUpdate, db: Session = Depends(
         user.card_number = update.card_number
     if update.payment_details is not None:
         user.payment_details = update.payment_details
-    if update.is_admin is not None:
-        user.is_admin = update.is_admin
 
     db.commit()
     db.refresh(user)

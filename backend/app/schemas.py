@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from datetime import datetime
 
@@ -17,7 +17,6 @@ class UserUpdate(BaseModel):
     phone: Optional[str] = None
     card_number: Optional[str] = None
     payment_details: Optional[str] = None
-    is_admin: Optional[int] = None
 
 
 class UserResponse(BaseModel):
@@ -79,10 +78,17 @@ class MemberResponse(BaseModel):
 # Expense schemas
 class ExpenseCreate(BaseModel):
     description: str
-    amount: float
+    amount: float = Field(gt=0)
     paid_by_id: int
     group_id: int
     split_between: List[int]  # member IDs who share the expense
+
+    @field_validator("split_between")
+    @classmethod
+    def split_members_must_be_unique(cls, member_ids: List[int]) -> List[int]:
+        if len(member_ids) != len(set(member_ids)):
+            raise ValueError("split_between must not contain duplicate members")
+        return member_ids
 
 
 class ExpenseResponse(BaseModel):
@@ -119,7 +125,7 @@ class DebtResponse(BaseModel):
 class PaymentCreate(BaseModel):
     from_member_id: int
     to_member_id: int
-    amount: float
+    amount: float = Field(gt=0)
     group_id: int
 
 

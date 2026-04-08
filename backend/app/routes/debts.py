@@ -7,15 +7,10 @@ from collections import defaultdict
 router = APIRouter()
 
 
-@router.get("/group/{group_id}", response_model=schemas.DebtResponse)
-def calculate_debts(group_id: int, db: Session = Depends(get_db)):
-    group = db.query(models.Group).filter(models.Group.id == group_id).first()
-    if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
-
+def build_debt_items(group_id: int, db: Session):
     members = db.query(models.Member).filter(models.Member.group_id == group_id).all()
     if not members:
-        return schemas.DebtResponse(group_id=group_id, group_name=group.name, debts=[])
+        return []
 
     member_names = {m.id: m.name for m in members}
 
@@ -90,12 +85,25 @@ def calculate_debts(group_id: int, db: Session = Depends(get_db)):
             i += 1
             j += 1
 
+    return debts
+
+
+@router.get("/group/{group_id}", response_model=schemas.DebtResponse)
+def calculate_debts(group_id: int, db: Session = Depends(get_db)):
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+
+    debts = build_debt_items(group_id, db)
     return schemas.DebtResponse(group_id=group_id, group_name=group.name, debts=debts)
 
 
 @router.post("/", response_model=schemas.PaymentResponse)
 def record_payment(payment: schemas.PaymentCreate, db: Session = Depends(get_db)):
     """Record a debt settlement payment between two members."""
+    if payment.from_member_id == payment.to_member_id:
+        raise HTTPException(status_code=400, detail="Cannot pay yourself")
+
     # Validate members belong to group
     from_member = db.query(models.Member).filter(
         models.Member.id == payment.from_member_id,
@@ -110,6 +118,16 @@ def record_payment(payment: schemas.PaymentCreate, db: Session = Depends(get_db)
     ).first()
     if not to_member:
         raise HTTPException(status_code=400, detail="To member not in group")
+
+    current_debt = next((
+        debt for debt in build_debt_items(payment.group_id, db)
+        if debt.from_member_id == payment.from_member_id
+        and debt.to_member_id == payment.to_member_id
+    ), None)
+    if not current_debt:
+        raise HTTPException(status_code=400, detail="No outstanding debt for these members")
+    if payment.amount > current_debt.amount + 0.01:
+        raise HTTPException(status_code=400, detail="Payment exceeds outstanding debt")
 
     db_payment = models.Payment(
         from_member_id=payment.from_member_id,
