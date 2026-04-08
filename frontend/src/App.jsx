@@ -44,6 +44,13 @@ function App() {
 
   const [activeTab, setActiveTab] = useState('mydebts')
 
+  // Admin state
+  const [adminTab, setAdminTab] = useState('users')
+  const [adminUsers, setAdminUsers] = useState([])
+  const [adminGroups, setAdminGroups] = useState([])
+  const [adminStats, setAdminStats] = useState(null)
+  const [adminLoading, setAdminLoading] = useState(false)
+
   // Check for saved session
   useEffect(() => {
     const savedUser = localStorage.getItem('expensesplitter_user')
@@ -273,6 +280,48 @@ function App() {
     d.to_member.toLowerCase() === currentUser.display_name.toLowerCase()
   ) : []
 
+  // ============ ADMIN ============
+  const fetchAdminData = async (type) => {
+    if (!currentUser?.is_admin) return
+    setAdminLoading(true)
+    try {
+      if (type === 'users') {
+        const res = await fetch(`${API_URL}/admin/users?user_id=${currentUser.id}`)
+        setAdminUsers(await res.json())
+      } else if (type === 'groups') {
+        const res = await fetch(`${API_URL}/admin/groups?user_id=${currentUser.id}`)
+        setAdminGroups(await res.json())
+      } else if (type === 'stats') {
+        const res = await fetch(`${API_URL}/admin/stats?user_id=${currentUser.id}`)
+        setAdminStats(await res.json())
+      }
+    } catch { setError('Failed to load admin data') }
+    setAdminLoading(false)
+  }
+
+  const toggleUserAdmin = async (userId) => {
+    try {
+      await fetch(`${API_URL}/admin/users/${userId}/admin?user_id=${currentUser.id}`, { method: 'PUT' })
+      fetchAdminData('users')
+    } catch { setError('Failed to toggle admin') }
+  }
+
+  const deleteUser = async (userId) => {
+    if (!confirm('Delete this user?')) return
+    try {
+      await fetch(`${API_URL}/admin/users/${userId}?user_id=${currentUser.id}`, { method: 'DELETE' })
+      fetchAdminData('users')
+    } catch { setError('Failed to delete user') }
+  }
+
+  const deleteGroup = async (groupId) => {
+    if (!confirm('Delete this group and all its data?')) return
+    try {
+      await fetch(`${API_URL}/admin/groups/${groupId}?user_id=${currentUser.id}`, { method: 'DELETE' })
+      fetchAdminData('groups')
+    } catch { setError('Failed to delete group') }
+  }
+
   // ============ AUTH SCREEN ============
   if (!currentUser) {
     return (
@@ -332,6 +381,9 @@ function App() {
         <h1 className="mb-0">💰 ExpenseSplitter</h1>
         <div className="d-flex gap-2">
           <Badge bg="primary" style={{fontSize: '0.9rem'}}>{currentUser.display_name}</Badge>
+          {currentUser.is_admin && (
+            <Button variant="outline-dark" size="sm" onClick={() => { setActiveTab('admin'); fetchAdminData('stats') }}>⚙️ Admin</Button>
+          )}
           <Button variant="outline-secondary" size="sm" onClick={openProfileModal}>👤 Profile</Button>
           <Button variant="outline-danger" size="sm" onClick={handleLogout}>Logout</Button>
         </div>
@@ -567,6 +619,67 @@ function App() {
                     </Card.Body>
                   </Card>
                 </Tab>
+
+                {/* ===== ADMIN ===== */}
+                {currentUser?.is_admin && (
+                  <Tab eventKey="admin" title="⚙️ Admin">
+                    <div className="d-flex gap-2 mb-3">
+                      <Button variant={adminTab === 'stats' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('stats'); fetchAdminData('stats') }}>Stats</Button>
+                      <Button variant={adminTab === 'users' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('users'); fetchAdminData('users') }}>Users</Button>
+                      <Button variant={adminTab === 'groups' ? 'primary' : 'outline-secondary'} size="sm" onClick={() => { setAdminTab('groups'); fetchAdminData('groups') }}>Groups</Button>
+                    </div>
+                    {adminTab === 'stats' && (
+                      <Card><Card.Body>
+                        {adminLoading ? <p>Loading...</p> : adminStats ? (
+                          <Row>
+                            <Col><div className="text-center"><h3>{adminStats.total_users}</h3><small className="text-muted">Users</small></div></Col>
+                            <Col><div className="text-center"><h3>{adminStats.total_groups}</h3><small className="text-muted">Groups</small></div></Col>
+                            <Col><div className="text-center"><h3>{adminStats.total_expenses}</h3><small className="text-muted">Expenses</small></div></Col>
+                            <Col><div className="text-center"><h3>{adminStats.total_payments}</h3><small className="text-muted">Payments</small></div></Col>
+                          </Row>
+                        ) : <p className="text-muted">No data</p>}
+                      </Card.Body></Card>
+                    )}
+                    {adminTab === 'users' && (
+                      <Card><Card.Body>
+                        {adminLoading ? <p>Loading...</p> : adminUsers.length === 0 ? <p className="text-muted">No users</p> : (
+                          <table className="table table-sm">
+                            <thead><tr><th>ID</th><th>Username</th><th>Name</th><th>Admin</th><th>Actions</th></tr></thead>
+                            <tbody>
+                              {adminUsers.map(u => (
+                                <tr key={u.id}>
+                                  <td>{u.id}</td><td>{u.username}</td><td>{u.display_name}</td>
+                                  <td><Badge bg={u.is_admin ? 'success' : 'secondary'}>{u.is_admin ? 'Yes' : 'No'}</Badge></td>
+                                  <td>
+                                    <Button size="sm" variant="outline-primary" className="me-1" onClick={() => toggleUserAdmin(u.id)}>Toggle Admin</Button>
+                                    {u.id !== currentUser.id && <Button size="sm" variant="outline-danger" onClick={() => deleteUser(u.id)}>Delete</Button>}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </Card.Body></Card>
+                    )}
+                    {adminTab === 'groups' && (
+                      <Card><Card.Body>
+                        {adminLoading ? <p>Loading...</p> : adminGroups.length === 0 ? <p className="text-muted">No groups</p> : (
+                          <table className="table table-sm">
+                            <thead><tr><th>ID</th><th>Name</th><th>Code</th><th>Created By</th><th>Actions</th></tr></thead>
+                            <tbody>
+                              {adminGroups.map(g => (
+                                <tr key={g.id}>
+                                  <td>{g.id}</td><td>{g.name}</td><td><code>{g.invite_code}</code></td><td>{g.created_by_id}</td>
+                                  <td><Button size="sm" variant="outline-danger" onClick={() => deleteGroup(g.id)}>Delete</Button></td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </Card.Body></Card>
+                    )}
+                  </Tab>
+                )}
               </Tabs>
             </>
           ) : (
