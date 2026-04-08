@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<!-- saved from url=(0049)file:///E:/se-toolkit-hackathon/presentation.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExpenseSplitter — Presentation</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fff;
+            color: #0f172a;
+        }
+
+        .slide {
+            width: 1123px;
+            min-height: 794px;
+            padding: 72px 88px;
+            page-break-after: always;
+            position: relative;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Slide 1 — Title */
+        .title-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .title-slide h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            color: #0f172a;
+            margin-bottom: 12px;
+        }
+
+        .title-slide .tagline {
+            font-size: 1.125rem;
+            color: #64748b;
+            margin-bottom: 48px;
+            font-weight: 400;
+        }
+
+        .title-slide .meta {
+            border-top: 1px solid #e2e8f0;
+            padding-top: 24px;
+        }
+
+        .title-slide .meta p {
+            font-size: 0.9375rem;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .title-slide .meta .name {
+            font-weight: 600;
+            color: #0f172a;
+            font-size: 1.0625rem;
+        }
+
+        /* Other slides */
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            margin-bottom: 32px;
+            color: #0f172a;
+        }
+
+        .section-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin-bottom: 6px;
+        }
+
+        .card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+        }
+
+        .card h4 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .card p {
+            color: #475569;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            margin-bottom: 16px;
+        }
+
+        .version-label {
+            display: inline-block;
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 12px;
+        }
+
+        .v1 {
+            background: #0f172a;
+            color: #fff;
+        }
+
+        .v2 {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 6px 0;
+            font-size: 0.875rem;
+            color: #475569;
+        }
+
+        .feature-list li::before {
+            content: '—';
+            color: #94a3b8;
+            margin-right: 10px;
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tech-item {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        .link-block {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .link-block .label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin-bottom: 4px;
+        }
+
+        .link-block .url {
+            font-size: 0.875rem;
+            color: #0f172a;
+            font-weight: 500;
+            word-break: break-all;
+        }
+
+        .screenshot-box {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 8px;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.8125rem;
+            text-align: center;
+        }
+
+        .qr-row {
+            display: flex;
+            gap: 40px;
+            margin-top: 24px;
+        }
+
+        .qr-item {
+            text-align: center;
+        }
+
+        .qr-box {
+            width: 140px;
+            height: 140px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-bottom: 8px;
+        }
+
+        .qr-item .qr-label {
+            font-size: 0.75rem;
+            color: #64748b;
+        }
+
+        .qr-img {
+            width: 140px;
+            height: 140px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 36px;
+            right: 88px;
+            color: #cbd5e1;
+            font-size: 0.75rem;
+        }
+
+        /* Print */
+        @media print {
+            body { background: #fff; }
+            .slide {
+                page-break-after: always;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .no-print { display: none; }
+        }
+
+        @page {
+            size: landscape;
+            margin: 0;
+        }
+
+        /* Print instructions */
+        .print-instructions {
+            text-align: center;
+            padding: 48px;
+            color: #64748b;
+        }
+
+        .print-instructions h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .print-instructions p {
+            font-size: 0.875rem;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SLIDE 1: Title -->
+    <div class="slide title-slide">
+        <div>
+            <h1>ExpenseSplitter</h1>
+            <p class="tagline">A web app that automatically calculates who owes whom after shared expenses.</p>
+            <div class="meta">
+                <p class="name">Sviatoslav Stanko</p>
+                <p>s.stanko@innopolis.university</p>
+                <p>Group DSAI-04</p>
+            </div>
+        </div>
+        <div class="footer">ExpenseSplitter — SE Toolkit Hackathon 2025</div>
+    </div>
+
+    <!-- SLIDE 2: Context -->
+    <div class="slide">
+        <div class="section-label">Slide 2</div>
+        <h2>Context</h2>
+
+        <div class="card">
+            <h4>End User</h4>
+            <p>University students, roommates, and friend groups who share living expenses, groceries, utilities, or travel costs.</p>
+        </div>
+
+        <div class="card">
+            <h4>Problem</h4>
+            <p>Tracking shared expenses and settling debts manually is tedious and error-prone. Friends avoid discussing money to prevent awkward conversations, leading to unresolved debts.</p>
+        </div>
+
+        <div class="card" style="border-left: 3px solid #0f172a;">
+            <h4>Solution</h4>
+            <p>A web app that automatically calculates who owes whom after shared expenses among friends, with invite-based group joining and personal payment details.</p>
+        </div>
+
+        <div class="footer">ExpenseSplitter — SE Toolkit Hackathon 2025</div>
+    </div>
+
+    <!-- SLIDE 3: Implementation -->
+    <div class="slide">
+        <div class="section-label">Slide 3</div>
+        <h2>Implementation</h2>
+
+        <div class="two-col">
+            <div>
+                <div class="version-label v1">Version 1</div>
+                <ul class="feature-list">
+                    <li>User registration and login</li>
+                    <li>Create expense groups with invite codes</li>
+                    <li>Add expenses with custom splits</li>
+                    <li>Automatic debt calculation algorithm</li>
+                    <li>React and Bootstrap web UI</li>
+                </ul>
+            </div>
+            <div>
+                <div class="version-label v2">Version 2</div>
+                <ul class="feature-list">
+                    <li>Join groups by invite code</li>
+                    <li>Personal profiles with payment details</li>
+                    <li>Mark as Paid with payment history</li>
+                    <li>My Debts tab - personalized view</li>
+                    <li>Docker Compose deployment</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>Tech Stack</h4>
+            <div class="tech-stack">
+                <div class="tech-item">Python / FastAPI</div>
+                <div class="tech-item">PostgreSQL</div>
+                <div class="tech-item">React</div>
+                <div class="tech-item">Bootstrap</div>
+                <div class="tech-item">Docker Compose</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h4>TA Feedback Addressed</h4>
+            <p>Replaced manual member addition with invite codes. Added personalized debt view so each user sees only their own obligations.</p>
+        </div>
+
+        <div class="footer">ExpenseSplitter — SE Toolkit Hackathon 2025</div>
+    </div>
+
+    <!-- SLIDE 4: Demo -->
+    <div class="slide">
+        <div class="section-label">Slide 4</div>
+        <h2>Demo</h2>
+
+        <div style="margin-bottom: 24px;">
+            <div class="two-col">
+                <div>
+                    <div class="screenshot-box">
+                        Screenshot 1<br>Registration and Group Creation
+                    </div>
+                </div>
+                <div>
+                    <div class="screenshot-box">
+                        Screenshot 2<br>My Debts View with Payment Details
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="border-left: 3px solid #0f172a;">
+            <h4>Video Demo</h4>
+            
+            <p>The video demo comes with the presentation</p>
+        </div>
+
+        <div class="footer">ExpenseSplitter — SE Toolkit Hackathon 2025</div>
+    </div>
+
+    <!-- SLIDE 5: Links -->
+    <div class="slide">
+        <div class="section-label">Slide 5</div>
+        <h2>Links</h2>
+
+        <div class="link-block">
+            <div style="flex: 1;">
+                <div class="label">GitHub Repository</div>
+                <div class="url">https://github.com/Kotumbaa/se-toolkit-hackathon</div>
+            </div>
+        </div>
+
+        <div class="link-block">
+            <div style="flex: 1;">
+                <div class="label">Deployed Product</div>
+                <div class="url">http://10.93.24.130/</div>
+            </div>
+        </div>
+
+        <div class="qr-row">
+            <div class="qr-item">
+                <img class="qr-img" src="./ExpenseSplitter — Presentation_files/qr-github.png" alt="QR: GitHub Repository">
+                <div class="qr-label">GitHub Repository</div>
+            </div>
+            <div class="qr-item">
+                <img class="qr-img" src="./ExpenseSplitter — Presentation_files/qr-app.png" alt="QR: Deployed Product">
+                <div class="qr-label">Deployed Product</div>
+            </div>
+        </div>
+
+        <div class="footer">ExpenseSplitter — SE Toolkit Hackathon 2025</div>
+    </div>
+
+    <!-- Print Instructions -->
+    <div class="print-instructions no-print">
+        <h3>How to save as PDF</h3>
+        <p>1. Open this file in Chrome or Edge</p>
+        <p>2. Press Ctrl + P</p>
+        <p>3. Select "Save as PDF"</p>
+        <p>4. Orientation: <strong>Landscape</strong></p>
+        <p>5. Enable "Background graphics"</p>
+        <p>6. Click Save</p>
+    </div>
+
+
+
+</body></html>
