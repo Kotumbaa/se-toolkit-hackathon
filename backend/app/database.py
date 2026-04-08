@@ -22,5 +22,18 @@ def get_db():
 
 
 def init_db():
-    """Create all tables on startup."""
+    """Create missing tables and apply lightweight schema fixes on startup."""
     Base.metadata.create_all(bind=engine)
+    with engine.begin() as connection:
+        connection.execute(text("""
+            ALTER TABLE users
+            ADD COLUMN IF NOT EXISTS is_admin INTEGER NOT NULL DEFAULT 0
+        """))
+        connection.execute(text("""
+            UPDATE users
+            SET is_admin = 1
+            WHERE id = 1
+              AND NOT EXISTS (
+                  SELECT 1 FROM users WHERE is_admin = 1
+              )
+        """))
