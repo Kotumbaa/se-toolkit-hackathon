@@ -4,8 +4,9 @@ A web app that automatically calculates who owes whom after shared expenses amon
 
 ## Demo
 
-![ExpenseSplitter Screenshot](docs/screenshot1.png)
-![Debt Calculation Screenshot](docs/screenshot2.png)
+![Registration and Group Creation](screenshot1.png)
+
+![My Debts View with Payment Details](screenshot2.png)
 
 ## Product Context
 
@@ -21,14 +22,18 @@ ExpenseSplitter lets users create expense groups, log who paid for what, and ins
 ## Features
 
 ### Implemented (Version 1)
-- ✅ Create expense groups
-- ✅ Add members to groups
-- ✅ Log expenses with custom splits
-- ✅ Automatic debt calculation (who owes whom)
-- ✅ Clean, responsive web UI
-- ✅ Docker deployment
+- ✅ User registration and login
+- ✅ Create expense groups with unique invite codes
+- ✅ Join groups by invite code
+- ✅ Add expenses with custom splits
+- ✅ Automatic debt calculation algorithm
+- ✅ Personal profiles with payment details
+- ✅ "Mark as Paid" with payment history
+- ✅ Personalized "My Debts" tab
+- ✅ Admin panel for user/group management
+- ✅ Docker Compose deployment
 
-### Not Yet Implemented (Version 2)
+### Planned (Future)
 - 🔄 LLM-powered expense entry (natural language parsing)
 - 🔄 Export reports (PDF/CSV)
 - 🔄 Expense history filtering
@@ -36,15 +41,12 @@ ExpenseSplitter lets users create expense groups, log who paid for what, and ins
 
 ## Usage
 
-1. Open the app in your browser
-2. Create a new group (e.g., "Apartment 42")
-3. Add members (e.g., "Alice", "Bob", "Charlie")
-4. Add expenses:
-   - Enter description (e.g., "Groceries")
-   - Enter amount
-   - Select who paid
-   - Choose who splits the cost
-5. Click "Who Owes Whom" tab to see debt settlement plan
+1. **Register** an account and fill in your payment details (phone, card)
+2. **Create** a new group (e.g., "Apartment 42") and share the invite code
+3. **Join** existing groups by entering their invite code
+4. **Add expenses**: enter description, amount, select who paid
+5. **Check "My Debts"** tab to see who you owe and who owes you
+6. **Mark as Paid** when debts are settled
 
 ## Deployment
 
